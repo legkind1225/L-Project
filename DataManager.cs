@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -9,12 +9,17 @@ public class DataManager : MonoBehaviour
 {
     public static DataManager Instance;
     public List<Image> SelectCharacterImage = new List<Image>();
+    private List<CharacterInfo> listCharater = new List<CharacterInfo>();
+    public List<int> listParty = new List<int>();
+    private List<EnemyInfo> listEnemy = new List<EnemyInfo>();
 
     public delegate void StageHandler();
     public static event StageHandler StageUp;
 
     public delegate void CoinHandler();
     public static event CoinHandler CoinUp;
+
+    private SaveData savedata;
 
     const float DEFAULT_SKILL_MULTIPLE = 1;
 
@@ -34,16 +39,17 @@ public class DataManager : MonoBehaviour
     [SerializeField]
     public class SaveData
     {
-        public int stage;
-        public int coin;
-        public int returnCoin;
+        public int stage { get; set; }
+
+        public int coin { get; set; }
+
+        public int returncoin { get; set; }
 
         public int GetNeedCoin(int upgrade)
         {
             return upgrade * 2;
         }
-
-
+        
         public void AddStageNum()
         {
             stage++;
@@ -78,14 +84,14 @@ public class DataManager : MonoBehaviour
 
         public void AddReturnCoin(int coinNum)
         {
-            returnCoin += coinNum;
+            returncoin += coinNum;
         }
 
         public void MinusReturnCoin(int coinNum)
         {
-            if (returnCoin < 0)
-                returnCoin = 0;
-            returnCoin -= coinNum;
+            if (returncoin < 0)
+                returncoin = 0;
+            returncoin -= coinNum;
         }
 
         public void UpdateCoinUI()
@@ -107,7 +113,6 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    private SaveData savedata;
 
     public void SetSavedata(SaveData savedataload)
     {
@@ -134,17 +139,11 @@ public class DataManager : MonoBehaviour
 
     public Text GetReturnCoinText(Text text)
     {
-        text.text = string.Format("{0}", GetSavedate().returnCoin);
+        text.text = string.Format("{0}", GetSavedate().returncoin);
 
         return text;
     }
-
-    private List<CharacterInfo> listCharater = new List<CharacterInfo>();
-
-    public List<int> listParty = new List<int>();
-
-    private List<EnemyInfo> listEnemy = new List<EnemyInfo>();
-
+    
     public class EnemyInfo
     {
         public EnemyInfo(int enemykey)
@@ -161,8 +160,7 @@ public class DataManager : MonoBehaviour
     List<SaveCharacterData.CharacterData> TransformData()
     {
         List<SaveCharacterData.CharacterData> characterData = new List<SaveCharacterData.CharacterData>();
-
-
+        
         for (int i = 0; i < 4; i++)
         {
             List<SaveCharacterData.WeaponData> weaponList = new List<SaveCharacterData.WeaponData>();
@@ -230,15 +228,13 @@ public class DataManager : MonoBehaviour
 
         public List<Weapon> weapon = new List<Weapon>();
         public List<Skill> skill = new List<Skill>();
-
-
+        
         public CharacterTable.Row characterRow;
-        public int equipWeaponKey;
+        public int equipWeaponKey { get; set; }
         public bool enterCharacterBool;
 
-        public void SetEquipWeaponKey(int Weaponkey, int CharacterKey)
+        public void SetEquipWeaponKey(int Weaponkey)
         {
-            //equipWeaponKey = Weaponkey - CharacterKey * 10;
             equipWeaponKey = Weaponkey;
         }
 
@@ -404,14 +400,14 @@ public class DataManager : MonoBehaviour
         }
     }
 
-    public class TotalWeaponStat
+    public struct TotalWeaponStat
     {
         public int atk;
         public int def;
         public int hp;
     }
 
-    public class TotalCollectionWeaponStat
+    public struct TotalCollectionWeaponStat
     {
         public int atk;
         public int def;
@@ -420,7 +416,7 @@ public class DataManager : MonoBehaviour
         public int avoidanceRate;
     }
 
-    public class TotalSkillStat
+    public struct TotalSkillStat
     {
         public float atkMultiple;
         public float defMultiple;
@@ -429,7 +425,7 @@ public class DataManager : MonoBehaviour
         public float skillValueMultiple;
     }
 
-    public class TotalStat
+    public struct TotalStat
     {
         public int atk;
         public int def;
@@ -449,7 +445,7 @@ public class DataManager : MonoBehaviour
 
         int selectedStatus;
         public bool lockedState = false;
-        public bool getNewBool = false;
+        public bool newState = false;
         public WeaponTable.Row rowWeapon;
 
         public Weapon(int weaponKey)
@@ -479,9 +475,7 @@ public class DataManager : MonoBehaviour
                 AccuracyRate,
                 AvoidanceRate,
             }
-
-
-
+            
             public eStatType statType;
             public eCollectionStatType collectionStatType;
             public int value;
